@@ -64,6 +64,10 @@ router.post('/login', async (req, res) => {
     }
 });
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 869e70b9b12f61f6ae3793d2d6a0becb1605d328
 // Add recipe to user's likedRecipes and update likes in recipes.json
 router.post('/like/:recipeId', authMiddleware, async (req, res) => {
     const user = await User.findByIdAndUpdate(
@@ -77,7 +81,10 @@ router.post('/like/:recipeId', authMiddleware, async (req, res) => {
     res.status(200).json({ message: 'Recipe liked successfully', likedRecipes: user.likedRecipes });
 });
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 869e70b9b12f61f6ae3793d2d6a0becb1605d328
 // Remove recipe from user's likedRecipes and update likes in recipes.json
 router.delete('/unlike/:recipeId', authMiddleware, async (req, res) => {
     const user = await User.findByIdAndUpdate(
@@ -90,6 +97,7 @@ router.delete('/unlike/:recipeId', authMiddleware, async (req, res) => {
 });
 
 
+<<<<<<< HEAD
 // Route to get all liked recipes for the authenticated user
 router.get('/liked', authMiddleware, async (req, res) => {
     // Populate liked recipes with full recipe details
@@ -109,4 +117,6 @@ router.get('/liked', authMiddleware, async (req, res) => {
 
 
 
+=======
+>>>>>>> 869e70b9b12f61f6ae3793d2d6a0becb1605d328
 module.exports = router;
