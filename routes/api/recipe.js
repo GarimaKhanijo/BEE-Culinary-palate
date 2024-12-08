@@ -35,3 +35,23 @@ router.get('/:id', async (req, res) => {
     }
     res.status(200).json(recipe);
 });
+
+// Delete a recipe by ID
+
+router.delete('/:id', authMiddleware, async (req, res) => {
+    const updateRecipe = await Recipe.findOneAndUpdate({ _id: req.params.id },
+        {
+            $set:
+            {
+                deleted_at: new Date()
+            }
+        });
+
+    console.log(updateRecipe);
+    if (!updateRecipe) {
+        return res.status(404).json({ message: "Recipe not found" });
+    }
+    else {
+        res.status(200).json({ message: "Recipe deleted successfully" });
+    }
+});
