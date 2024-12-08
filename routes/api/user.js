@@ -65,4 +65,29 @@ router.post('/login', async (req, res) => {
 });
 
 
+// Add recipe to user's likedRecipes and update likes in recipes.json
+router.post('/like/:recipeId', authMiddleware, async (req, res) => {
+    const user = await User.findByIdAndUpdate(
+        req.user.id,
+        { $addToSet: { likedRecipes: req.params.recipeId } }, // $addToSet prevents duplicates
+        { new: true }
+    );
+    if (!user) {
+        return res.status(400).json({ message: 'No user found' });
+    }
+    res.status(200).json({ message: 'Recipe liked successfully', likedRecipes: user.likedRecipes });
+});
+
+// Remove recipe from user's likedRecipes and update likes in recipes.json
+router.delete('/unlike/:recipeId', authMiddleware, async (req, res) => {
+    const user = await User.findByIdAndUpdate(
+        req.user.id,
+        { $pull: { likedRecipes: req.params.recipeId } }, // $pull removes specific item from array
+        { new: true }
+    );
+
+    res.status(200).json({ message: 'Recipe unliked successfully', likedRecipes: user.likedRecipes });
+});
+
+
 module.exports = router;
