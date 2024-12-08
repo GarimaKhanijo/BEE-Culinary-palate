@@ -104,3 +104,46 @@ router.delete('/:id', authMiddleware, async (req, res) => {
         res.status(200).json({ message: "Recipe deleted successfully" });
     }
 });
+
+
+// Add a comment to a recipe
+router.post('/:id/comments', authMiddleware, async (req, res) => {
+    const { content } = req.body;
+    if (!content) {
+        return res.status(400).json({ message: "Comment content is required" });
+    }
+
+    const newComment = {
+        userId: req.user.email,
+        content,
+        createdAt: new Date()
+    };
+
+    // Find the recipe and add the comment
+    const recipe = await Recipe.findByIdAndUpdate(
+        req.params.id,
+        {
+            $push: {
+                comments: newComment
+            }
+        },
+        { new: true } // Return the updated document
+    );
+    if (recipe && recipe._id) {
+        res.status(201).json(newComment);
+    }
+    else {
+        return res.status(404).json({ message: "something went wrong while adding comment" });
+    }
+});
+
+// Get all comments for a recipe
+router.get('/:id/comments', async (req, res) => {
+    const recipe = await Recipe.findOne({ _id: req.params.id }); // Retrieves recipe
+    if (!recipe) {
+        return res.status(404).json({ message: "Recipe not found" });
+    }
+    res.status(200).json({ comments: recipe.comments });
+});
+
+module.exports = router;
