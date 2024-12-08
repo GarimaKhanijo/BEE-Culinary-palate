@@ -36,6 +36,55 @@ router.get('/:id', async (req, res) => {
     res.status(200).json(recipe);
 });
 
+// Add a new recipe
+router.post('/', authMiddleware, upload.single('coverImage'), async (req, res) => {
+    const { title, ingredients, instructions, time } = req.body;
+    console.log(`adding new recipe: ${title}, ${ingredients}, ${instructions}, ${time}`);
+
+    if (!title || !ingredients || !instructions) {
+        return res.status(400).json({ message: "Required fields can't be empty" });
+    }
+
+    let coverImagePath = null;
+    if (req.file) {
+        const uniqueFilename = `${uuidv4()}-${req.file.originalname}`;
+        const outputFilePath = path.join(__dirname, '../../images', uniqueFilename);
+
+        try {
+            await sharp(req.file.path)
+                .resize({ width: 200, height: 200 })
+                .toFile(outputFilePath);
+
+            coverImagePath = `/images/${uniqueFilename}`;
+        } catch (err) {
+            console.error("Error processing image:", err);
+            return res.status(500).json({ message: "Error processing image" });
+        }
+    }
+
+    // Create a new recipe instance
+    const newRecipe = new Recipe({
+        title: title,
+        ingredients: ingredients.split(','),
+        instructions: instructions,
+        time: time,
+        coverImage: coverImagePath,
+        createdBy: req.user ? req.user.id : null, // User ID of the recipe creator
+        likes: false, // Default to `false` if not provided
+        comments: [], // Default to an empty array if not provided
+        deleted_at: null
+    });
+
+    // Save the recipe to the database
+    const savedRecipe = await newRecipe.save();
+    if (savedRecipe && savedRecipe._id) {
+        console.log('Recipe stored successfully:', savedRecipe);
+        res.status(201).json(newRecipe);
+    }
+    else {
+        return res.status(400).json({ error: "Failed to add recipe" });
+    }
+});
 // Delete a recipe by ID
 
 router.delete('/:id', authMiddleware, async (req, res) => {
