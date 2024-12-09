@@ -235,38 +235,38 @@ function displayLikedRecipes(recipes) {
 
 // Fetch liked recipes when the page loads
 fetchLikedRecipes();
-    // Handle form submission for new recipe on newrecipe.html page
-    if (window.location.pathname.includes('newrecipe.html')) {
-        const recipeForm = document.getElementById('recipeForm');
+   // Handle form submission for new recipe on newrecipe.html page
+   if (window.location.pathname.includes('newrecipe.html')) {
+    const recipeForm = document.getElementById('recipeForm');
 
-        recipeForm.addEventListener('submit', function (e) {
-            e.preventDefault();
-            const formData = new FormData(recipeForm);
-            const token = localStorage.getItem('token');
+    recipeForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(recipeForm);
+        const token = localStorage.getItem('token');
 
-            fetch(`http://localhost:3000/api/recipes`, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
+        fetch(`http://localhost:3000/api/recipes`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            },
+            body: formData
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
             })
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(err => { throw err; });
-                    }
-                    return response.json();
-                })
-                .then(newRecipe => {
-                    alert('Recipe added successfully!');
-                    window.location.href = '/index.html'; // Redirect to home page after submission
-                })
-                .catch(error => {
-                    console.error('Error adding recipe:', error);
-                    alert(error.message || 'Failed to add recipe.');
-                });
-        });
-    }
+            .then(newRecipe => {
+                alert('Recipe added successfully!');
+                window.location.href = '/index.html'; // Redirect to home page after submission
+            })
+            .catch(error => {
+                console.error('Error adding recipe:', error);
+                alert(error.message || 'Failed to add recipe.');
+            });
+    });
+}
 
 
     // Handle the liked.html page (view liked recipes)
