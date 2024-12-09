@@ -405,6 +405,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 });
         });
     }
+
     if (window.location.pathname.includes('profile.html')) {
         const emailDisplay = document.getElementById('user-email'); // Ensure this ID matches the one in profile.html
 

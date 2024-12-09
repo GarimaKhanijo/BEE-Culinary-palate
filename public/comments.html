@@ -4,18 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Recipe Comments</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <h1 id="recipe-title">Recipe Comments</h1>
-        <a href="index.html" class="btn">Back to Recipes</a>
-    </header>
+        
     <main>
-        <section>
-            <h2>Comments</h2>
-            <ul id="comments-list"></ul>
-        </section>
+        <nav>
+            <a href="index.html" class="logo">Culinary Palate</a>
+    
+            <!-- Display User Email and Profile/Logout buttons if logged in -->
+            <div id="userNav">
+                <!-- These elements will be dynamically inserted by JavaScript -->
+            </div>
+        </nav>
 
         <section>
             <h2>Add a Comment</h2>
@@ -24,6 +25,12 @@
                 <button type="submit" class="btn">Add Comment</button>
             </form>
         </section>
+
+        <section>
+            <h2>Comments</h2>
+            <ul id="comments-list"></ul>
+        </section>
+
     </main>
 
     <script>
@@ -49,9 +56,12 @@
 
                 comments['comments'].forEach(comment => {
                     const commentItem = document.createElement('li');
+                    commentItem.classList.add('comment-item');
                     commentItem.innerHTML = `
-                        <p>${comment.content}</p>
-                        <small>By User ID: ${comment.userId} on ${new Date(comment.createdAt).toLocaleString()}</small>
+                        <div class="comment-header">
+                            <strong>${comment.userId}</strong> <small>${new Date(comment.createdAt).toLocaleString()}</small>
+                        </div>
+                        <p class="comment-content">${comment.content}</p>
                     `;
                     commentsList.appendChild(commentItem);
                 });
