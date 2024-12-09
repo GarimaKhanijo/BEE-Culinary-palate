@@ -309,3 +309,112 @@ fetchLikedRecipes();
                 likedRecipesContainer.innerHTML = '<p>Error loading liked recipes</p>';
             });
     }
+
+
+
+    const fetchRecipes = async () => {
+        try {
+            const response = await fetch('/api/recipes');
+            const recipes = await response.json();
+            return recipes;
+        } catch (error) {
+            console.error("Error fetching recipes:", error);
+            return [];
+        }
+    };
+
+
+    const displayAllRecipes = async () => {
+        const recipes = await fetchRecipes();
+        recipes.forEach(recipe => {
+            const recipeDiv = document.createElement('div');
+            recipeDiv.className = 'recipe';
+            recipeDiv.innerHTML = `
+            <h12>${recipe.title}</h12>
+            <img src="${recipe.coverImage || '/default-image.jpg'}" alt="${recipe.title}" />
+        `;
+            recipeDiv.onclick = () => window.location.href = `/recipe.html?id=${recipe._id}`;
+            recipesContainer.appendChild(recipeDiv);
+        });
+    };
+
+    const displaySearchResults = (filteredRecipes) => {
+        searchResultsContainer.innerHTML = "";
+
+        if (filteredRecipes.length === 0) {
+            searchResultsContainer.innerHTML = `<p>No recipes found matching your search.</p>`;
+        } else {
+            filteredRecipes.forEach((recipe) => {
+                const recipeCard = document.createElement("div");
+                recipeCard.className = "searchedrecipe";
+
+                recipeCard.innerHTML = `
+                <div class="recipe-image-container">
+                    <img src="${recipe.coverImage || '/default-image.jpg'}" alt="${recipe.title}" class="recipe-image" />
+                </div>
+                <div class="recipe-content">
+                    <h3 class="recipe-title">${recipe.title}</h3>
+                    <p class="recipe-description">${recipe.ingredients.slice(0, 3).join(", ")}...</p>
+                    <button class="recipe-link view-recipe-button">View Recipe</button>
+                </div>
+            `;
+
+                // Attach the card to the container
+                searchResultsContainer.appendChild(recipeCard);
+
+                // Add the navigation functionality for the entire card
+                recipeCard.addEventListener('click', () => {
+                    window.location.href = `/recipe.html?id=${recipe._id}`;
+                });
+
+                // Prevent the card navigation when clicking on the button
+                const viewRecipeButton = recipeCard.querySelector(".view-recipe-button");
+                viewRecipeButton.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Stop the event from propagating to the card
+                    window.location.href = `/recipe.html?id=${recipe._id}`;
+                });
+            });
+        }
+    };
+
+    const navigateToRecipe = (id) => {
+        window.location.href = `/recipe.html?id=${id}`;
+    };
+    // Function to handle search functionality
+    const searchRecipes = async () => {
+        const query = searchInput.value.trim().toLowerCase(); // Get and normalize the query input
+
+        if (!query) {
+            searchResultsContainer.innerHTML = "<p>Please enter a search term.</p>";
+            return;
+        }
+
+        const recipes = await fetchRecipes();  // Fetch all recipes
+
+        // Filter recipes based on the query (case-insensitive) matching only the title
+        const filteredRecipes = recipes.filter(recipe =>
+            recipe.title.toLowerCase().includes(query)
+        );
+
+        // If no results found, show a message
+        if (filteredRecipes.length === 0) {
+            searchResultsContainer.innerHTML = `<p>No recipes found matching your search.</p>`;
+        } else {
+            displaySearchResults(filteredRecipes);
+        }
+    };
+
+
+
+    // Listen for search form submission
+    searchForm.addEventListener("submit", function (e) {
+        e.preventDefault();
+        searchRecipes();
+    });
+
+    // Optionally: Perform search when the user types in the search input (live search)
+    searchInput.addEventListener("input", function () {
+        searchRecipes();
+    });
+
+});
