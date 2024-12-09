@@ -310,7 +310,48 @@ fetchLikedRecipes();
             });
     }
 
+// Handle registration form submission on register.html page
+if (window.location.pathname.includes('register.html')) {
+    const registerForm = document.getElementById('registerForm');
 
+    registerForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        fetch(`http://localhost:3000/api/users/register`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, password })
+        })
+            .then(response => {
+                if (!response.ok) {
+
+                    return response.json().then(data => {
+                        if (data.redirectToLogin) {
+                            throw new Error('User already exists. Please log in.');
+                        }
+                        throw new Error(data.error || 'Registration failed');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.token) {
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('userEmail', email); // Store email
+                    alert('Registration successful. Please log in.');
+                    window.location.href = '/login.html'; // Redirect to login page after registration
+                }
+            })
+            .catch(error => {
+                alert(error.message);
+                console.error('Error during registration:', error);
+            });
+    });
+}
 
     const fetchRecipes = async () => {
         try {
